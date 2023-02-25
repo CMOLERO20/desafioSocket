@@ -1,0 +1,88 @@
+<div>
+    <h2>Productos</h2>
+  
+</div>
+<div id="lista" ></div>
+<div>
+    <h2>Agregar producto</h2>
+
+<form id="formulario">
+  <label for="title">Nombre:</label><br>
+  <input type="text" id="title" name="title" ><br>
+  <label for="description">Description:</label><br>
+  <input type="text" id="description" name="Description" ><br>
+  <label for="price">price:</label><br>
+   <input type="text" id="price" name="price" ><br>
+  <label for="thumbnail">thumbnail:</label><br>
+  <input type="text" id="thumbnail" name="thumbnail" ><br>
+  <label for="code">code:</label><br>
+   <input type="text" id="code" name="code" ><br>
+  <label for="stock">stock:</label><br>
+  <input type="number" id="stock" name="stock" ><br><br>
+  <input type="submit" value="Submit">
+</form>
+</div>
+<div>
+  <h2>Eliminar producto</h2>
+<form id="deleteP" >
+  <label for="pid">Id:</label><br>
+  <input type="text" id="pid" name="title" ><br><br>
+   <input type="submit" value="Submit">
+</form>
+</div>
+<script  src="/socket.io/socket.io.js"></script>
+<script  >
+  const lista = document.getElementById('lista');
+
+const renderLista = (prod) => {
+    let productos = "";
+    prod.forEach((pro)=>{
+        productos += `id ${pro.id} - ${pro.title}<br/>`
+    })
+    lista.innerHTML = productos;
+}
+
+//////// evento de agregar producto
+const title = document.querySelector("#title");
+const description= document.getElementById("description");
+const price = document.getElementById("price");
+const thumbnail = document.getElementById("thumbnail");
+const code = document.getElementById("code");
+const stock = document.getElementById("stock");
+
+const form = document.getElementById("formulario");
+
+form.addEventListener('submit', e =>{
+    e.preventDefault();
+   
+        saveProduct(title.value,description.value,price.value,thumbnail.value,code.value,stock.value)
+        
+        
+})
+
+/////// evento de borrar producto
+const deleteId = document.getElementById('pid');
+const formDelete = document.getElementById('deleteP')
+
+formDelete.addEventListener('submit', e => {
+  e.preventDefault();
+  deleteProduct(deleteId);
+})
+
+/////// SOcket io
+const socket = io.connect();
+
+const saveProduct = (title , description, price, thumbnail  , code , stock) =>{
+    socket.emit('client:newP', {
+        title , description, code, price  , stock , thumbnail
+    });
+};
+
+const deleteProduct = (id) => {
+    socket.emit('client:deleteP', id)
+};
+
+socket.on('productos', (productos) => {
+    renderLista(productos)
+})
+</script>
